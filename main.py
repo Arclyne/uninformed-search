@@ -120,53 +120,79 @@ def reconstruir_camino(parents, start, goal):
 
 
 def bfs(mapa, start, goal):
+    print(f"\n=== BFS: {start} -> {goal} ===")
+
     if start == goal:
+        print(f"Nodo inicial ya es el objetivo: {start}")
         return deque([start])
 
     visited = {start}
     parents = {}
     cola = deque([start])
+    orden_recorrido = [start]
 
     while cola:
         actual = cola.popleft()
+        print(f"\nExpandiendo nodo: {actual}  (cola restante: {list(cola)})")
 
         for vecino in mapa.obtener_vecinos(actual):
             if vecino not in visited:
                 visited.add(vecino)
                 parents[vecino] = actual
+                orden_recorrido.append(vecino)
+                print(f"  Descubierto: {vecino}  (padre: {actual}) -> se encola")
 
                 if vecino == goal:
+                    print(f"\nObjetivo '{goal}' encontrado.")
+                    print(f"Recorrido del árbol: {orden_recorrido}")
                     return reconstruir_camino(parents, start, goal)
 
                 cola.append(vecino)
+            else:
+                print(f"  Ya visitado: {vecino} -> se descarta")
 
+    print("No se encontró el objetivo.")
     return None
 
 
 def dfs(mapa, start, goal):
+    print(f"\n=== DFS: {start} -> {goal} ===")
+
     if start == goal:
+        print(f"Nodo inicial ya es el objetivo: {start}")
         return deque([start])
 
     visited = {start}
     parents = {}
+    orden_recorrido = [start]
 
-    def buscar(actual):
+    def buscar(actual, profundidad):
+        sangria = "  " * profundidad
+        print(f"{sangria}Visitando nodo: {actual}")
+
         for vecino in mapa.obtener_vecinos(actual):
             if vecino not in visited:
                 visited.add(vecino)
                 parents[vecino] = actual
+                orden_recorrido.append(vecino)
+                print(f"{sangria}  Descubierto: {vecino}  (padre: {actual})")
 
                 if vecino == goal:
+                    print(f"\nObjetivo '{goal}' encontrado.")
                     return True
 
-                if buscar(vecino):
+                if buscar(vecino, profundidad + 1):
                     return True
+            else:
+                print(f"{sangria}  Ya visitado: {vecino} -> se descarta")
 
         return False
 
-    if buscar(start):
+    if buscar(start, 0):
+        print(f"Recorrido del árbol: {orden_recorrido}")
         return reconstruir_camino(parents, start, goal)
 
+    print("No se encontró el objetivo.")
     return None
 
 
